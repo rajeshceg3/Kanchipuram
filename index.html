@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kanchipuram: A Contemplation of Form [Hardened]</title>
+
+    <!--
+        VULN-002 [FIXED]: Added Subresource Integrity (SRI) hashes and crossorigin attribute.
+        This ensures the fetched files have not been tampered with, mitigating supply chain attacks.
+    -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --base-background: #fdfdfd;
+            --panel-background: rgba(250, 250, 250, 0.85);
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --accent-gold: #c5a12d;
+            --accent-gold-faded: rgba(197, 161, 45, 0.1);
+            --border-color: rgba(0, 0, 0, 0.08);
+            --error-color: #D32F2F;
+            --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --shadow-hard: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background-color: var(--base-background); font-family: var(--font-main); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        #map { height: 100%; width: 100%; background-color: #e8e8e8; z-index: 1; }
+        #app-container { opacity: 0; animation: fadeInApp 1.5s var(--timing-function) 0.5s forwards; }
+        @keyframes fadeInApp { to { opacity: 1; } }
+        #panel { position: absolute; top: 20px; right: 20px; width: 320px; max-height: calc(100vh - 40px); background: var(--panel-background); backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%); border-radius: 16px; border: 1px solid var(--border-color); box-shadow: var(--shadow-soft); z-index: 1000; display: flex; flex-direction: column; transform: translateX(20px); opacity: 0; animation: slideInPanel 1.2s var(--timing-function) 1s forwards; }
+        @keyframes slideInPanel { to { transform: translateX(0); opacity: 1; } }
+        .panel-header { padding: 24px; border-bottom: 1px solid var(--border-color); }
+        .panel-header h1 { font-size: 16px; font-weight: 600; color: var(--text-primary); margin: 0 0 4px 0; letter-spacing: -0.5px; }
+        .panel-header p { font-size: 13px; font-weight: 400; color: var(--text-secondary); margin: 0; line-height: 1.5; }
+        .network-error { display: none; background-color: var(--error-color); color: white; font-size: 12px; padding: 8px 24px; text-align: center; }
+        .network-error.visible { display: block; }
+        #temple-list { list-style: none; padding: 8px; margin: 0; overflow-y: auto; flex-grow: 1; }
+        #temple-list li { padding: 14px 16px; margin: 4px 0; cursor: pointer; border-radius: 10px; transition: background-color 0.4s var(--timing-function), transform 0.4s var(--timing-function); position: relative; }
+        #temple-list li:hover, #temple-list li:focus { background-color: var(--accent-gold-faded); transform: scale(1.02); outline: none; }
+        #temple-list li.active { background-color: var(--accent-gold-faded); }
+        #temple-list h2 { font-size: 15px; font-weight: 500; margin: 0 0 2px 0; color: var(--text-primary); }
+        #temple-list p { font-size: 12px; font-weight: 400; margin: 0; color: var(--text-secondary); line-height: 1.4; }
+        .temple-marker { width: 18px; height: 18px; background-color: var(--text-primary); border: 2px solid var(--base-background); border-radius: 50%; box-shadow: var(--shadow-hard); transition: all 0.4s var(--timing-function); }
+        .temple-marker.highlight, .leaflet-marker-icon:hover .temple-marker { background-color: var(--accent-gold); transform: scale(1.8); }
+        .temple-marker.active { background-color: var(--accent-gold); transform: scale(2.2); animation: pulse 1.5s infinite var(--timing-function); }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(197, 161, 45, 0.7), var(--shadow-hard); } 70% { box-shadow: 0 0 0 15px rgba(197, 161, 45, 0), var(--shadow-hard); } 100% { box-shadow: 0 0 0 0 rgba(197, 161, 45, 0), var(--shadow-hard); } }
+        .leaflet-popup-content-wrapper { background: var(--panel-background); backdrop-filter: blur(10px) saturate(150%); -webkit-backdrop-filter: blur(10px) saturate(150%); color: var(--text-primary); border-radius: 12px; box-shadow: var(--shadow-soft); border: 1px solid var(--border-color); padding: 2px; }
+        .leaflet-popup-content { margin: 16px; line-height: 1.6; font-size: 14px; }
+        .leaflet-popup-content h3 { margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: var(--text-primary); border-bottom: 2px solid var(--accent-gold); padding-bottom: 8px; }
+        .leaflet-popup-content p { margin: 0; font-weight: 400; color: var(--text-secondary); }
+        .leaflet-popup-tip-container { display: none; }
+        .leaflet-control-zoom { border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow-soft); overflow: hidden; }
+        .leaflet-control-zoom a { background-color: var(--panel-background); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: var(--text-primary); width: 34px; height: 34px; line-height: 34px; }
+        .leaflet-control-zoom a:hover { background-color: var(--accent-gold-faded); color: var(--accent-gold); }
+        .leaflet-control-zoom-in { border-bottom: 1px solid var(--border-color); }
+        @media (max-width: 768px) { #panel { width: calc(100% - 20px); top: auto; bottom: 10px; left: 10px; right: 10px; max-height: 45vh; animation: slideInPanelFromBottom 1.2s var(--timing-function) 1s forwards; transform: translateY(20px); } @keyframes slideInPanelFromBottom { to { transform: translateY(0); opacity: 1; } } }
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        <div id="map"></div>
+        <div id="panel">
+            <header class="panel-header">
+                <h1>Hello.</h1>
+                <p>This is a quiet exploration of Kanchipuram's most sacred spaces. Select a temple to begin your journey.</p>
+            </header>
+            <!-- VULN-004 [FIXED]: Added error panel for network failures -->
+            <div id="network-error-banner" class="network-error">Map service is currently unavailable.</div>
+            <ul id="temple-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        // VULN-006 [MITIGATION]: In a production environment, this data would be fetched from a secure API endpoint.
+        // const temples = await fetch('/api/temples').then(res => res.json());
+        const temples = [
+            { id: 'kailasanathar', name: 'Kailasanathar Temple', era: 'Late 7th Century CE', coords: [12.8430, 79.6925], description: 'The city’s oldest temple. A testament to Pallava sandstone architecture, its form is a universe of intricate carvings and divine chapels.' },
+            { id: 'ekambareswarar', name: 'Ekambareswarar Temple', era: 'Ancient, Rebuilt 16th Century', coords: [12.8475, 79.7027], description: 'A manifestation of earth. Dominated by its towering gopuram, it houses a sacred mango tree said to be 3,500 years old.' },
+            { id: 'varadharaja', name: 'Varadharaja Perumal Temple', era: '1053 CE', coords: [12.8227, 79.7214], description: 'One of the holy Divya Desams. Its famed 100-pillared hall is a masterpiece of Vijayanagara art, each column a story in stone.' },
+            { id: 'kamakshi', name: 'Kamakshi Amman Temple', era: 'Believed 6th Century, Rebuilt 14th', coords: [12.8415, 79.7032], description: 'The heart of Shakti worship in Kanchipuram. The Goddess sits in a yogic posture of profound peace, the focal point of devotion.' },
+            { id: 'vaikunta', name: 'Vaikunta Perumal Temple', era: 'Late 8th Century CE', coords: [12.8361, 79.7119], description: 'A structural marvel built by the Pallavas, its cloistered hallways are lined with lion-pillared verandas, narrating the dynasty’s history.' },
+            { id: 'chitragupta', name: 'Chitragupta Swamy Temple', era: '9th Century CE', coords: [12.8400, 79.7001], description: 'A rare temple dedicated to the celestial keeper of deeds. A place of contemplation on life, action, and consequence.' }
+        ];
+
+        // VULN-001 [FIXED]: Sanitization utility to prevent XSS attacks.
+        const sanitizeHTML = (str) => {
+            const temp = document.createElement('div');
+            temp.textContent = str;
+            return temp.innerHTML;
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            let isTransitioning = false; // VULN-005 [FIXED]: State lock for animations.
+
+            const map = L.map('map', { zoomControl: false }).setView([12.84, 79.70], 14);
+            L.control.zoom({ position: 'bottomleft' }).addTo(map);
+            
+            // VULN-005 [FIXED]: Set transition lock to false when any map movement completes.
+            map.on('moveend', () => {
+                isTransitioning = false;
+            });
+
+            const tileLayer = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
+                attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> — Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                subdomains: 'abcd', minZoom: 12, maxZoom: 17, ext: 'png'
+            });
+
+            // VULN-004 [FIXED]: Graceful failure for tile service.
+            tileLayer.on('tileerror', () => {
+                document.getElementById('network-error-banner').classList.add('visible');
+            });
+
+            tileLayer.addTo(map);
+
+            const templeList = document.getElementById('temple-list');
+            const markers = {};
+            let activeMarker = null;
+
+            temples.forEach(temple => {
+                const icon = L.divIcon({ className: 'temple-marker-container', html: `<div id="marker-${temple.id}" class="temple-marker"></div>`, iconSize: [18, 18], iconAnchor: [9, 9] });
+                const marker = L.marker(temple.coords, { icon: icon, alt: temple.name }).addTo(map); // Added alt text for accessibility
+                
+                // VULN-001 [FIXED]: Using sanitized data for popup content.
+                const popupContent = `<h3>${sanitizeHTML(temple.name)}</h3><p>${sanitizeHTML(temple.description)}</p>`;
+                marker.bindPopup(popupContent);
+                
+                markers[temple.id] = marker;
+
+                const li = document.createElement('li');
+                li.id = `item-${temple.id}`;
+                li.innerHTML = `<h2>${sanitizeHTML(temple.name)}</h2><p>${sanitizeHTML(temple.era)}</p>`;
+                
+                // VULN-003 [FIXED]: Adding ARIA roles and tabindex for accessibility.
+                li.setAttribute('role', 'button');
+                li.setAttribute('tabindex', '0');
+
+                const handleInteraction = () => {
+                    // VULN-005 [FIXED]: Check transition lock before firing action.
+                    if (isTransitioning) return;
+                    isTransitioning = true;
+                    
+                    map.flyTo(temple.coords, 16, { animate: true, duration: 1.5, easeLinearity: 0.25 });
+                    marker.openPopup();
+                };
+                
+                li.addEventListener('click', handleInteraction);
+                
+                // VULN-003 [FIXED]: Adding keyboard accessibility.
+                li.addEventListener('keyup', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        handleInteraction();
+                    }
+                });
+
+                li.addEventListener('mouseover', () => document.getElementById(`marker-${temple.id}`).classList.add('highlight'));
+                li.addEventListener('mouseout', () => document.getElementById(`marker-${temple.id}`).classList.remove('highlight'));
+                marker.on('click', handleInteraction);
+                marker.on('popupopen', () => setActive(temple.id));
+                marker.on('popupclose', () => clearActive());
+                
+                templeList.appendChild(li);
+            });
+            
+            function setActive(templeId) {
+                clearActive();
+                const markerDiv = document.getElementById(`marker-${templeId}`);
+                const listItem = document.getElementById(`item-${templeId}`);
+                if (markerDiv) markerDiv.classList.add('active');
+                if (listItem) {
+                    listItem.classList.add('active');
+                    // Ensure the active item is visible in the scrollable list.
+                    listItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+                activeMarker = templeId;
+            }
+
+            function clearActive() {
+                if (activeMarker) {
+                    const oldMarkerDiv = document.getElementById(`marker-${activeMarker}`);
+                    const oldListItem = document.getElementById(`item-${activeMarker}`);
+                    if(oldMarkerDiv) oldMarkerDiv.classList.remove('active', 'highlight');
+                    if(oldListItem) oldListItem.classList.remove('active');
+                }
+                activeMarker = null;
+            }
+        });
+    </script>
+</body>
+</html>
