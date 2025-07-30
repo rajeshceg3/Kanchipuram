@@ -14,63 +14,70 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --base-background: #fdfdfd;
-            --panel-background: rgba(250, 250, 250, 0.85);
-            --text-primary: #333333;
-            --text-secondary: #666666;
-            --accent-gold: #c5a12d;
-            --accent-gold-faded: rgba(197, 161, 45, 0.1);
-            --border-color: rgba(0, 0, 0, 0.08);
+            --base-background: #f4f1ea;
+            --panel-background: rgba(249, 246, 241, 0.8);
+            --text-primary: #5c544b;
+            --text-secondary: #9e958a;
+            --accent-gold: #b29a74;
+            --accent-gold-faded: rgba(178, 154, 116, 0.1);
+            --border-color: rgba(0, 0, 0, 0.05);
             --error-color: #D32F2F;
-            --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.1);
-            --shadow-hard: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --shadow-soft: 0 12px 40px rgba(0, 0, 0, 0.1);
+            --shadow-hard: 0 6px 18px rgba(0, 0, 0, 0.1);
             --timing-function: cubic-bezier(0.65, 0, 0.35, 1);
-            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --font-main: 'Work Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --font-serif: 'Lora', serif;
         }
-        html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background-color: var(--base-background); font-family: var(--font-main); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-        #map { height: 100%; width: 100%; background-color: #e8e8e8; z-index: 1; }
+        html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background-color: var(--base-background); font-family: var(--font-main); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; font-weight: 300; }
+        #map { height: 100%; width: 100%; background-color: #e0e0e0; z-index: 1; }
         #app-container { opacity: 0; animation: fadeInApp 1.5s var(--timing-function) 0.5s forwards; }
         @keyframes fadeInApp { to { opacity: 1; } }
-        #panel { position: absolute; top: 20px; right: 20px; width: 320px; max-height: calc(100vh - 40px); background: var(--panel-background); backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%); border-radius: 16px; border: 1px solid var(--border-color); box-shadow: var(--shadow-soft); z-index: 1000; display: flex; flex-direction: column; transform: translateX(20px); opacity: 0; animation: slideInPanel 1.2s var(--timing-function) 1s forwards; }
+        #panel { position: absolute; top: 20px; right: 20px; width: 340px; max-height: calc(100vh - 40px); background: var(--panel-background); backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); border-radius: 20px; border: 1px solid var(--border-color); box-shadow: var(--shadow-soft); z-index: 1000; display: flex; flex-direction: column; transform: translateX(20px); opacity: 0; animation: slideInPanel 1.2s var(--timing-function) 1s forwards; }
         @keyframes slideInPanel { to { transform: translateX(0); opacity: 1; } }
-        .panel-header { padding: 24px; border-bottom: 1px solid var(--border-color); }
-        .panel-header h1 { font-size: 16px; font-weight: 600; color: var(--text-primary); margin: 0 0 4px 0; letter-spacing: -0.5px; }
-        .panel-header p { font-size: 13px; font-weight: 400; color: var(--text-secondary); margin: 0; line-height: 1.5; }
+        .panel-header { padding: 32px; border-bottom: 1px solid var(--border-color); text-align: center; }
+        .panel-header h1 { font-family: var(--font-serif); font-size: 26px; font-weight: 500; color: var(--text-primary); margin: 0 0 8px 0; letter-spacing: -0.5px; }
+        .panel-header p { font-size: 14px; font-weight: 400; color: var(--text-secondary); margin: 0; line-height: 1.6; font-style: italic; }
         .network-error { display: none; background-color: var(--error-color); color: white; font-size: 12px; padding: 8px 24px; text-align: center; }
         .network-error.visible { display: block; }
-        #temple-list { list-style: none; padding: 8px; margin: 0; overflow-y: auto; flex-grow: 1; }
-        #temple-list li { padding: 14px 16px; margin: 4px 0; cursor: pointer; border-radius: 10px; transition: background-color 0.4s var(--timing-function), transform 0.4s var(--timing-function); position: relative; }
-        #temple-list li:hover, #temple-list li:focus { background-color: var(--accent-gold-faded); transform: scale(1.02); outline: none; }
-        #temple-list li.active { background-color: var(--accent-gold-faded); }
-        #temple-list h2 { font-size: 15px; font-weight: 500; margin: 0 0 2px 0; color: var(--text-primary); }
-        #temple-list p { font-size: 12px; font-weight: 400; margin: 0; color: var(--text-secondary); line-height: 1.4; }
-        .temple-marker { width: 18px; height: 18px; background-color: var(--text-primary); border: 2px solid var(--base-background); border-radius: 50%; box-shadow: var(--shadow-hard); transition: all 0.4s var(--timing-function); }
-        .temple-marker.highlight, .leaflet-marker-icon:hover .temple-marker { background-color: var(--accent-gold); transform: scale(1.8); }
-        .temple-marker.active { background-color: var(--accent-gold); transform: scale(2.2); animation: pulse 1.5s infinite var(--timing-function); }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(197, 161, 45, 0.7), var(--shadow-hard); } 70% { box-shadow: 0 0 0 15px rgba(197, 161, 45, 0), var(--shadow-hard); } 100% { box-shadow: 0 0 0 0 rgba(197, 161, 45, 0), var(--shadow-hard); } }
-        .leaflet-popup-content-wrapper { background: var(--panel-background); backdrop-filter: blur(10px) saturate(150%); -webkit-backdrop-filter: blur(10px) saturate(150%); color: var(--text-primary); border-radius: 12px; box-shadow: var(--shadow-soft); border: 1px solid var(--border-color); padding: 2px; }
-        .leaflet-popup-content { margin: 16px; line-height: 1.6; font-size: 14px; }
-        .leaflet-popup-content h3 { margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: var(--text-primary); border-bottom: 2px solid var(--accent-gold); padding-bottom: 8px; }
+        #temple-list { list-style: none; padding: 12px; margin: 0; overflow-y: auto; flex-grow: 1; }
+        #temple-list li { padding: 16px 20px; margin: 6px 0; cursor: pointer; border-radius: 12px; transition: background-color 0.4s var(--timing-function), transform 0.4s var(--timing-function); position: relative; border-left: 3px solid transparent; }
+        #temple-list li:hover, #temple-list li:focus { background-color: var(--accent-gold-faded); transform: translateX(-5px) scale(1.03); outline: none; }
+        #temple-list li.active { background-color: var(--accent-gold-faded); border-left-color: var(--accent-gold); }
+        #temple-list h2 { font-family: var(--font-serif); font-size: 17px; font-weight: 500; margin: 0 0 4px 0; color: var(--text-primary); }
+        #temple-list p { font-size: 13px; font-weight: 400; margin: 0; color: var(--text-secondary); line-height: 1.4; font-style: italic; }
+        .temple-marker { width: 22px; height: 22px; background-color: var(--text-primary); border: 2px solid var(--base-background); border-radius: 50%; box-shadow: var(--shadow-hard); transition: all 0.4s var(--timing-function); background-image: url('https://source.unsplash.com/random/22x22?temple'); }
+        .temple-marker.highlight, .leaflet-marker-icon:hover .temple-marker { background-color: var(--accent-gold); transform: scale(1.5); }
+        .temple-marker.active { background-color: var(--accent-gold); transform: scale(1.9); animation: pulse 1.8s infinite var(--timing-function); }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(178, 154, 116, 0.7), var(--shadow-hard); } 70% { box-shadow: 0 0 0 18px rgba(178, 154, 116, 0), var(--shadow-hard); } 100% { box-shadow: 0 0 0 0 rgba(178, 154, 116, 0), var(--shadow-hard); } }
+        .leaflet-popup-content-wrapper { background: rgba(249, 246, 241, 0.85); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); color: var(--text-primary); border-radius: 16px; box-shadow: var(--shadow-soft); border: 1px solid rgba(255,255,255,0.2); padding: 4px; }
+        .leaflet-popup-content { margin: 20px; line-height: 1.7; font-size: 15px; }
+        .leaflet-popup-content h3 { font-family: var(--font-serif); margin: 0 0 10px 0; font-size: 22px; font-weight: 500; color: var(--text-primary); border-bottom: 1px solid var(--accent-gold); padding-bottom: 10px; }
         .leaflet-popup-content p { margin: 0; font-weight: 400; color: var(--text-secondary); }
         .leaflet-popup-tip-container { display: none; }
-        .leaflet-control-zoom { border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow-soft); overflow: hidden; }
-        .leaflet-control-zoom a { background-color: var(--panel-background); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: var(--text-primary); width: 34px; height: 34px; line-height: 34px; }
+        .leaflet-control-zoom { border: 1px solid rgba(255,255,255,0.3); border-radius: 16px; box-shadow: var(--shadow-soft); overflow: hidden; }
+        .leaflet-control-zoom a { background-color: var(--panel-background); backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); color: var(--text-primary); width: 38px; height: 38px; line-height: 38px; font-size: 20px; }
         .leaflet-control-zoom a:hover { background-color: var(--accent-gold-faded); color: var(--accent-gold); }
-        .leaflet-control-zoom-in { border-bottom: 1px solid var(--border-color); }
+        .leaflet-control-zoom-in { border-bottom: 1px solid rgba(0,0,0,0.05); }
         @media (max-width: 768px) { #panel { width: calc(100% - 20px); top: auto; bottom: 10px; left: 10px; right: 10px; max-height: 45vh; animation: slideInPanelFromBottom 1.2s var(--timing-function) 1s forwards; transform: translateY(20px); } @keyframes slideInPanelFromBottom { to { transform: translateY(0); opacity: 1; } } }
+        #loader { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--base-background); z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 1s 1s ease-out; }
+        .spinner { width: 50px; height: 50px; border: 5px solid var(--accent-gold-faded); border-top-color: var(--accent-gold); border-radius: 50%; animation: spin 1s ease-in-out infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
+    <div id="loader">
+        <div class="spinner"></div>
+    </div>
     <div id="app-container">
         <div id="map"></div>
         <div id="panel">
             <header class="panel-header">
-                <h1>Hello.</h1>
-                <p>This is a quiet exploration of Kanchipuram's most sacred spaces. Select a temple to begin your journey.</p>
+                <h1>Kanchipuram</h1>
+                <p>A quiet exploration of sacred spaces. Select a temple to begin your journey.</p>
             </header>
             <!-- VULN-004 [FIXED]: Added error panel for network failures -->
             <div id="network-error-banner" class="network-error">Map service is currently unavailable.</div>
@@ -98,6 +105,14 @@
         };
 
         document.addEventListener('DOMContentLoaded', () => {
+            const loader = document.getElementById('loader');
+            window.addEventListener('load', () => {
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 1000);
+            });
+
             let isTransitioning = false; // VULN-005 [FIXED]: State lock for animations.
 
             const map = L.map('map', { zoomControl: false }).setView([12.84, 79.70], 14);
