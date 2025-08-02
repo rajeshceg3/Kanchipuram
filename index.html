@@ -58,6 +58,12 @@
         .leaflet-popup-content h3 { font-family: var(--font-serif); margin: 0 0 10px 0; font-size: 22px; font-weight: 500; color: var(--text-primary); border-bottom: 1px solid var(--accent-gold); padding-bottom: 10px; }
         .leaflet-popup-content p { margin: 0; font-weight: 400; color: var(--text-secondary); }
         .leaflet-popup-tip-container { display: none; }
+        .panel-filters { padding: 20px 24px 12px; border-bottom: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 16px; }
+        .filter-group { display: flex; flex-direction: column; }
+        .filter-group label { font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .filter-group select { width: 100%; padding: 10px 12px; background-color: var(--base-background); border: 1px solid var(--border-color); border-radius: 10px; font-family: var(--font-main); font-size: 14px; color: var(--text-primary); cursor: pointer; -webkit-appearance: none; -moz-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%239e958a' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; transition: all 0.3s var(--timing-function); }
+        .filter-group select:hover { border-color: var(--accent-gold); }
+        .filter-group select:focus { outline: none; border-color: var(--accent-gold); box-shadow: 0 0 0 3px var(--accent-gold-faded); }
         .leaflet-control-zoom { border: 1px solid rgba(255,255,255,0.3); border-radius: 16px; box-shadow: var(--shadow-soft); overflow: hidden; }
         .leaflet-control-zoom a { background-color: var(--panel-background); backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); color: var(--text-primary); width: 38px; height: 38px; line-height: 38px; font-size: 20px; }
         .leaflet-control-zoom a:hover { background-color: var(--accent-gold-faded); color: var(--accent-gold); }
@@ -79,6 +85,25 @@
                 <h1>Kanchipuram</h1>
                 <p>A quiet exploration of sacred spaces. Select a temple to begin your journey.</p>
             </header>
+            <div class="panel-filters">
+                <div class="filter-group">
+                    <label for="deity-filter">Filter by Deity</label>
+                    <select id="deity-filter">
+                        <option value="all">All Deities</option>
+                        <option value="Shiva">Shiva</option>
+                        <option value="Vishnu">Vishnu</option>
+                        <option value="Shakti">Shakti</option>
+                        <option value="Chitragupta">Chitragupta</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="style-filter">Filter by Style</label>
+                    <select id="style-filter">
+                        <option value="all">All Styles</option>
+                        <!-- Options populated by JS -->
+                    </select>
+                </div>
+            </div>
             <!-- VULN-004 [FIXED]: Added error panel for network failures -->
             <div id="network-error-banner" class="network-error">Map service is currently unavailable.</div>
             <ul id="temple-list"></ul>
@@ -86,17 +111,6 @@
     </div>
 
     <script>
-        // VULN-006 [MITIGATION]: In a production environment, this data would be fetched from a secure API endpoint.
-        // const temples = await fetch('/api/temples').then(res => res.json());
-        const temples = [
-            { id: 'kailasanathar', name: 'Kailasanathar Temple', era: 'Late 7th Century CE', coords: [12.8430, 79.6925], description: 'The city’s oldest temple. A testament to Pallava sandstone architecture, its form is a universe of intricate carvings and divine chapels.' },
-            { id: 'ekambareswarar', name: 'Ekambareswarar Temple', era: 'Ancient, Rebuilt 16th Century', coords: [12.8475, 79.7027], description: 'A manifestation of earth. Dominated by its towering gopuram, it houses a sacred mango tree said to be 3,500 years old.' },
-            { id: 'varadharaja', name: 'Varadharaja Perumal Temple', era: '1053 CE', coords: [12.8227, 79.7214], description: 'One of the holy Divya Desams. Its famed 100-pillared hall is a masterpiece of Vijayanagara art, each column a story in stone.' },
-            { id: 'kamakshi', name: 'Kamakshi Amman Temple', era: 'Believed 6th Century, Rebuilt 14th', coords: [12.8415, 79.7032], description: 'The heart of Shakti worship in Kanchipuram. The Goddess sits in a yogic posture of profound peace, the focal point of devotion.' },
-            { id: 'vaikunta', name: 'Vaikunta Perumal Temple', era: 'Late 8th Century CE', coords: [12.8361, 79.7119], description: 'A structural marvel built by the Pallavas, its cloistered hallways are lined with lion-pillared verandas, narrating the dynasty’s history.' },
-            { id: 'chitragupta', name: 'Chitragupta Swamy Temple', era: '9th Century CE', coords: [12.8400, 79.7001], description: 'A rare temple dedicated to the celestial keeper of deeds. A place of contemplation on life, action, and consequence.' }
-        ];
-
         // VULN-001 [FIXED]: Sanitization utility to prevent XSS attacks.
         const sanitizeHTML = (str) => {
             const temp = document.createElement('div');
@@ -105,85 +119,124 @@
         };
 
         document.addEventListener('DOMContentLoaded', () => {
+            // DOM Elements
             const loader = document.getElementById('loader');
-            window.addEventListener('load', () => {
-                loader.style.opacity = '0';
-                setTimeout(() => {
-                    loader.style.display = 'none';
-                }, 1000);
-            });
+            const networkErrorBanner = document.getElementById('network-error-banner');
+            const templeList = document.getElementById('temple-list');
+            const deityFilter = document.getElementById('deity-filter');
+            const styleFilter = document.getElementById('style-filter');
 
-            let isTransitioning = false; // VULN-005 [FIXED]: State lock for animations.
-
+            // Map Initialization
             const map = L.map('map', { zoomControl: false }).setView([12.84, 79.70], 14);
             L.control.zoom({ position: 'bottomleft' }).addTo(map);
-            
-            // VULN-005 [FIXED]: Set transition lock to false when any map movement completes.
-            map.on('moveend', () => {
-                isTransitioning = false;
-            });
-
             const tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>',
                 subdomains: 'abcd',
                 maxZoom: 20
             });
-
-            // VULN-004 [FIXED]: Graceful failure for tile service.
             tileLayer.on('tileerror', () => {
-                document.getElementById('network-error-banner').classList.add('visible');
+                networkErrorBanner.textContent = 'Map service is currently unavailable.';
+                networkErrorBanner.classList.add('visible');
             });
-
             tileLayer.addTo(map);
 
-            const templeList = document.getElementById('temple-list');
-            const markers = {};
+            // Global State
+            let allTemples = [];
+            let isTransitioning = false;
             let activeMarker = null;
+            const markers = {};
+            map.on('moveend', () => { isTransitioning = false; });
 
-            temples.forEach(temple => {
-                const icon = L.divIcon({ className: 'temple-marker-container', html: `<div id="marker-${temple.id}" class="temple-marker"></div>`, iconSize: [18, 18], iconAnchor: [9, 9] });
-                const marker = L.marker(temple.coords, { icon: icon, alt: temple.name }).addTo(map); // Added alt text for accessibility
-                
-                // VULN-001 [FIXED]: Using sanitized data for popup content.
-                const popupContent = `<h3>${sanitizeHTML(temple.name)}</h3><p>${sanitizeHTML(temple.description)}</p>`;
-                marker.bindPopup(popupContent);
-                
-                markers[temple.id] = marker;
+            // Data Fetching and Initialization
+            fetch('temples.json')
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
+                .then(temples => {
+                    allTemples = temples;
+                    populateStyleFilter(allTemples);
+                    renderUI(allTemples);
 
-                const li = document.createElement('li');
-                li.id = `item-${temple.id}`;
-                li.innerHTML = `<h2>${sanitizeHTML(temple.name)}</h2><p>${sanitizeHTML(temple.era)}</p>`;
-                
-                // VULN-003 [FIXED]: Adding ARIA roles and tabindex for accessibility.
-                li.setAttribute('role', 'button');
-                li.setAttribute('tabindex', '0');
+                    deityFilter.addEventListener('change', applyFilters);
+                    styleFilter.addEventListener('change', applyFilters);
 
-                const handleInteraction = () => {
-                    // VULN-005 [FIXED]: Check transition lock before firing action.
-                    if (isTransitioning) return;
-                    isTransitioning = true;
-                    
-                    map.flyTo(temple.coords, 16, { animate: true, duration: 1.5, easeLinearity: 0.25 });
-                    marker.openPopup();
-                };
-                
-                li.addEventListener('click', handleInteraction);
-                
-                // VULN-003 [FIXED]: Adding keyboard accessibility.
-                li.addEventListener('keyup', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        handleInteraction();
-                    }
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.style.display = 'none', 1000);
+                })
+                .catch(error => {
+                    console.error("Failed to load temple data:", error);
+                    networkErrorBanner.textContent = 'Failed to load temple data. Please try again later.';
+                    networkErrorBanner.classList.add('visible');
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.style.display = 'none', 1000);
                 });
 
-                li.addEventListener('mouseover', () => document.getElementById(`marker-${temple.id}`).classList.add('highlight'));
-                li.addEventListener('mouseout', () => document.getElementById(`marker-${temple.id}`).classList.remove('highlight'));
-                marker.on('click', handleInteraction);
-                marker.on('popupopen', () => setActive(temple.id));
-                marker.on('popupclose', () => clearActive());
+            function populateStyleFilter(temples) {
+                const styles = [...new Set(temples.map(t => t.architectural_style))];
+                styles.sort();
+                styles.forEach(style => {
+                    const option = document.createElement('option');
+                    option.value = style;
+                    option.textContent = style;
+                    styleFilter.appendChild(option);
+                });
+            }
+
+            function applyFilters() {
+                const selectedDeity = deityFilter.value;
+                const selectedStyle = styleFilter.value;
+
+                const filteredTemples = allTemples.filter(temple => {
+                    const deityMatch = selectedDeity === 'all' || temple.deity === selectedDeity;
+                    const styleMatch = selectedStyle === 'all' || temple.architectural_style === selectedStyle;
+                    return deityMatch && styleMatch;
+                });
+
+                renderUI(filteredTemples);
+            }
+
+            function renderUI(temples) {
+                // Clear existing UI elements
+                templeList.innerHTML = '';
+                Object.values(markers).forEach(marker => marker.remove());
                 
-                templeList.appendChild(li);
-            });
+                temples.forEach(temple => {
+                    const icon = L.divIcon({ className: 'temple-marker-container', html: `<div id="marker-${temple.id}" class="temple-marker"></div>`, iconSize: [18, 18], iconAnchor: [9, 9] });
+                    const marker = L.marker(temple.coords, { icon: icon, alt: temple.name }).addTo(map);
+
+                    const popupContent = `<h3>${sanitizeHTML(temple.name)}</h3><p>${sanitizeHTML(temple.description)}</p>`;
+                    marker.bindPopup(popupContent);
+
+                    markers[temple.id] = marker;
+
+                    const li = document.createElement('li');
+                    li.id = `item-${temple.id}`;
+                    li.innerHTML = `<h2>${sanitizeHTML(temple.name)}</h2><p>${sanitizeHTML(temple.era)}</p>`;
+                    li.setAttribute('role', 'button');
+                    li.setAttribute('tabindex', '0');
+
+                    const handleInteraction = () => {
+                        if (isTransitioning) return;
+                        isTransitioning = true;
+                        map.flyTo(temple.coords, 16, { animate: true, duration: 1.5, easeLinearity: 0.25 });
+                        marker.openPopup();
+                    };
+
+                    li.addEventListener('click', handleInteraction);
+                    li.addEventListener('keyup', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') handleInteraction();
+                    });
+
+                    li.addEventListener('mouseover', () => document.getElementById(`marker-${temple.id}`).classList.add('highlight'));
+                    li.addEventListener('mouseout', () => document.getElementById(`marker-${temple.id}`).classList.remove('highlight'));
+                    marker.on('click', handleInteraction);
+                    marker.on('popupopen', () => setActive(temple.id));
+                    marker.on('popupclose', () => clearActive());
+
+                    templeList.appendChild(li);
+                });
+            }
             
             function setActive(templeId) {
                 clearActive();
@@ -192,7 +245,6 @@
                 if (markerDiv) markerDiv.classList.add('active');
                 if (listItem) {
                     listItem.classList.add('active');
-                    // Ensure the active item is visible in the scrollable list.
                     listItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }
                 activeMarker = templeId;
