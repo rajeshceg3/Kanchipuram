@@ -30,9 +30,21 @@ html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden;
 #temple-list li.active { background-color: var(--accent-gold-faded); border-left-color: var(--accent-gold); }
 #temple-list h2 { font-family: var(--font-serif); font-size: 17px; font-weight: 500; margin: 0 0 4px 0; color: var(--text-primary); }
 #temple-list p { font-size: 13px; font-weight: 400; margin: 0; color: var(--text-secondary); line-height: 1.4; font-style: italic; }
-.temple-marker { width: 22px; height: 22px; background-color: var(--text-primary); border: 2px solid var(--base-background); border-radius: 50%; box-shadow: var(--shadow-hard); transition: all 0.4s var(--timing-function); background-image: url('https://source.unsplash.com/random/22x22?temple'); }
-.temple-marker.highlight, .leaflet-marker-icon:hover .temple-marker { background-color: var(--accent-gold); transform: scale(1.5); }
-.temple-marker.active { background-color: var(--accent-gold); transform: scale(1.9); animation: pulse 1.8s infinite var(--timing-function); }
+
+/* Replaced external image with gradient for reliability and security */
+.temple-marker {
+    width: 22px;
+    height: 22px;
+    background-color: var(--text-primary);
+    border: 2px solid var(--base-background);
+    border-radius: 50%;
+    box-shadow: var(--shadow-hard);
+    transition: all 0.4s var(--timing-function);
+    background-image: linear-gradient(135deg, var(--text-primary) 0%, #3e3832 100%);
+}
+
+.temple-marker.highlight, .leaflet-marker-icon:hover .temple-marker { background-color: var(--accent-gold); transform: scale(1.5); background-image: linear-gradient(135deg, var(--accent-gold) 0%, #8f7a5b 100%); }
+.temple-marker.active { background-color: var(--accent-gold); transform: scale(1.9); animation: pulse 1.8s infinite var(--timing-function); background-image: linear-gradient(135deg, var(--accent-gold) 0%, #8f7a5b 100%); }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(178, 154, 116, 0.7), var(--shadow-hard); } 70% { box-shadow: 0 0 0 18px rgba(178, 154, 116, 0), var(--shadow-hard); } 100% { box-shadow: 0 0 0 0 rgba(178, 154, 116, 0), var(--shadow-hard); } }
 .leaflet-popup-content-wrapper { background: rgba(249, 246, 241, 0.85); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); color: var(--text-primary); border-radius: 16px; box-shadow: var(--shadow-soft); border: 1px solid rgba(255,255,255,0.2); padding: 4px; }
 .leaflet-popup-content { margin: 20px; line-height: 1.7; font-size: 15px; }
@@ -47,3 +59,7 @@ html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden;
 #loader { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--base-background); z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 1s 1s ease-out; }
 .spinner { width: 50px; height: 50px; border: 5px solid var(--accent-gold-faded); border-top-color: var(--accent-gold); border-radius: 50%; animation: spin 1s ease-in-out infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* Utility Classes for JS Manipulation */
+.fade-out { opacity: 0; }
+.hidden { display: none !important; }
