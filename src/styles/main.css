@@ -15,10 +15,94 @@
 }
 html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background-color: var(--base-background); font-family: var(--font-main); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; font-weight: 300; }
 #map { height: 100%; width: 100%; background-color: #e0e0e0; z-index: 1; position: absolute; top: 0; left: 0; }
-#app-container { opacity: 1; }
+#app-container { opacity: 1; position: relative; height: 100%; width: 100%; }
 @keyframes fadeInApp { to { opacity: 1; } }
-#panel { position: absolute; top: 20px; right: 20px; width: 340px; max-height: calc(100vh - 40px); background: var(--panel-background); backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); border-radius: 20px; border: 1px solid var(--border-color); box-shadow: var(--shadow-soft); z-index: 1000; display: flex; flex-direction: column; transform: translateX(20px); opacity: 0; animation: slideInPanel 1.2s var(--timing-function) 1s forwards; }
+
+/* Skip Link */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--accent-gold);
+    color: white;
+    padding: 8px;
+    z-index: 9999;
+    transition: top 0.3s;
+    text-decoration: none;
+    font-weight: 500;
+}
+.skip-link:focus {
+    top: 0;
+}
+
+/* Panel Toggle Button */
+.panel-toggle {
+    display: none;
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: var(--panel-background);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-hard);
+    z-index: 1001;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s var(--timing-function);
+}
+.panel-toggle .icon {
+    width: 20px;
+    height: 2px;
+    background-color: var(--text-primary);
+    position: relative;
+    transition: all 0.3s ease;
+}
+.panel-toggle .icon::before, .panel-toggle .icon::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 2px;
+    background-color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+.panel-toggle .icon::before { top: -6px; }
+.panel-toggle .icon::after { top: 6px; }
+
+/* Panel Toggle Active State (Chevron Down) */
+.panel-toggle.collapsed .icon { background-color: transparent; }
+.panel-toggle.collapsed .icon::before { transform: rotate(45deg); top: 0; }
+.panel-toggle.collapsed .icon::after { transform: rotate(-45deg); top: 0; }
+
+
+#panel { position: absolute; top: 20px; right: 20px; width: 340px; max-height: calc(100vh - 40px); background: var(--panel-background); backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); border-radius: 20px; border: 1px solid var(--border-color); box-shadow: var(--shadow-soft); z-index: 1000; display: flex; flex-direction: column; transform: translateX(20px); opacity: 0; animation: slideInPanel 1.2s var(--timing-function) 1s forwards; transition: transform 0.4s var(--timing-function), opacity 0.4s var(--timing-function); }
 @keyframes slideInPanel { to { transform: translateX(0); opacity: 1; } }
+
+/* Panel Mobile Behavior */
+@media (max-width: 768px) {
+    .panel-toggle { display: flex; }
+    #panel {
+        width: calc(100% - 20px);
+        top: auto;
+        bottom: 80px; /* Space for toggle */
+        left: 10px;
+        right: 10px;
+        max-height: 45vh;
+        animation: none; /* Disable initial animation on mobile to respect toggle state if needed, or keep it */
+        transform: translateY(0); /* Start visible */
+        opacity: 1;
+    }
+
+    #panel.hidden-mobile {
+        transform: translateY(110%);
+        opacity: 0;
+        pointer-events: none;
+    }
+}
+
 .panel-header { padding: 32px; border-bottom: 1px solid var(--border-color); text-align: center; }
 .panel-header h1 { font-family: var(--font-serif); font-size: 26px; font-weight: 500; color: var(--text-primary); margin: 0 0 8px 0; letter-spacing: -0.5px; }
 .panel-header p { font-size: 14px; font-weight: 400; color: var(--text-secondary); margin: 0; line-height: 1.6; font-style: italic; }
@@ -55,7 +139,7 @@ html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden;
 .leaflet-control-zoom a { background-color: var(--panel-background); backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); color: var(--text-primary); width: 38px; height: 38px; line-height: 38px; font-size: 20px; }
 .leaflet-control-zoom a:hover { background-color: var(--accent-gold-faded); color: var(--accent-gold); }
 .leaflet-control-zoom-in { border-bottom: 1px solid rgba(0,0,0,0.05); }
-@media (max-width: 768px) { #panel { width: calc(100% - 20px); top: auto; bottom: 10px; left: 10px; right: 10px; max-height: 45vh; animation: slideInPanelFromBottom 1.2s var(--timing-function) 1s forwards; transform: translateY(20px); } @keyframes slideInPanelFromBottom { to { transform: translateY(0); opacity: 1; } } }
+
 #loader { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--base-background); z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 1s 1s ease-out; }
 .spinner { width: 50px; height: 50px; border: 5px solid var(--accent-gold-faded); border-top-color: var(--accent-gold); border-radius: 50%; animation: spin 1s ease-in-out infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
