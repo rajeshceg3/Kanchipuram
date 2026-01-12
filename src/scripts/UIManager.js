@@ -1,27 +1,53 @@
 import { sanitizeHTML } from './utils.js';
 
+/**
+ * @typedef {import('./DataManager.js').Temple} Temple
+ */
+
 export class UIManager {
     constructor() {
         this.loader = document.getElementById('loader');
         this.listElement = document.getElementById('temple-list');
         this.errorBanner = document.getElementById('network-error-banner');
+        this.panel = document.getElementById('panel');
+        this.panelToggle = document.getElementById('panel-toggle');
+        this.activeItem = null;
         this.callbacks = {
+            /** @type {(id: string) => void} */
             onItemClick: () => {},
+            /** @type {(id: string) => void} */
             onItemHover: () => {},
+            /** @type {(id: string) => void} */
             onItemBlur: () => {}
         };
     }
 
     initLoader() {
         window.addEventListener('load', () => {
-            this.loader.classList.add('fade-out');
-            setTimeout(() => {
-                this.loader.classList.add('hidden');
-            }, 1000);
+            if (this.loader) {
+                this.loader.classList.add('fade-out');
+                setTimeout(() => {
+                    this.loader.classList.add('hidden');
+                }, 1000);
+            }
         });
+
+        // Initialize mobile toggle
+        if (this.panelToggle && this.panel) {
+            this.panelToggle.addEventListener('click', () => {
+                const isHidden = this.panel.classList.toggle('hidden-mobile');
+                this.panelToggle.classList.toggle('collapsed');
+                this.panelToggle.setAttribute('aria-expanded', !isHidden);
+            });
+        }
     }
 
+    /**
+     * Renders the list of temples.
+     * @param {Temple[]} temples
+     */
     renderList(temples) {
+        if (!this.listElement) return;
         this.listElement.innerHTML = '';
         temples.forEach(temple => {
             const li = document.createElement('li');
@@ -29,25 +55,34 @@ export class UIManager {
             li.innerHTML = `<h2>${sanitizeHTML(temple.name)}</h2><p>${sanitizeHTML(temple.era)}</p>`;
             li.setAttribute('role', 'button');
             li.setAttribute('tabindex', '0');
+            li.setAttribute('aria-label', `Select ${temple.name}`);
 
             li.addEventListener('click', () => this.callbacks.onItemClick(temple.id));
-            li.addEventListener('keyup', (e) => {
+            li.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault(); // Prevent scrolling for Space
                     this.callbacks.onItemClick(temple.id);
                 }
             });
             li.addEventListener('mouseover', () => this.callbacks.onItemHover(temple.id));
             li.addEventListener('mouseout', () => this.callbacks.onItemBlur(temple.id));
+            li.addEventListener('focus', () => this.callbacks.onItemHover(temple.id)); // Accessibility: hover effect on focus
+            li.addEventListener('blur', () => this.callbacks.onItemBlur(temple.id));
 
             this.listElement.appendChild(li);
         });
     }
 
+    /**
+     * Sets the active item in the list.
+     * @param {string} id
+     */
     setActiveItem(id) {
         this.clearActiveItem();
         const li = document.getElementById(`item-${id}`);
         if (li) {
             li.classList.add('active');
+            li.setAttribute('aria-selected', 'true');
             li.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
         this.activeItem = id;
@@ -56,13 +91,19 @@ export class UIManager {
     clearActiveItem() {
         if (this.activeItem) {
             const li = document.getElementById(`item-${this.activeItem}`);
-            if (li) li.classList.remove('active');
+            if (li) {
+                li.classList.remove('active');
+                li.setAttribute('aria-selected', 'false');
+            }
         }
         this.activeItem = null;
     }
 
     showError() {
-        this.errorBanner.classList.add('visible');
+        if (this.errorBanner) {
+            this.errorBanner.classList.add('visible');
+            this.errorBanner.setAttribute('role', 'alert');
+        }
     }
 
     setCallbacks(callbacks) {

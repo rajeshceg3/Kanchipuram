@@ -2,20 +2,38 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { sanitizeHTML } from './utils.js';
 
+/**
+ * @typedef {import('./DataManager.js').Temple} Temple
+ */
+
 export class MapManager {
+    /**
+     * @param {string} mapId - The DOM ID of the map container.
+     */
     constructor(mapId) {
         this.mapId = mapId;
+        /** @type {L.Map | null} */
         this.map = null;
+        /** @type {Object.<string, L.Marker>} */
         this.markers = {};
+        /** @type {string | null} */
         this.activeMarker = null;
         this.isTransitioning = false;
         this.callbacks = {
+            /** @type {(id: string) => void} */
             onMarkerClick: () => {},
+            /** @type {(id: string) => void} */
             onPopupOpen: () => {},
+            /** @type {(id: string) => void} */
             onPopupClose: () => {}
         };
     }
 
+    /**
+     * Initializes the Leaflet map.
+     * @param {[number, number]} center - Initial center coordinates.
+     * @param {number} zoom - Initial zoom level.
+     */
     init(center, zoom) {
         this.map = L.map(this.mapId, { zoomControl: false }).setView(center, zoom);
         L.control.zoom({ position: 'bottomleft' }).addTo(this.map);
@@ -38,6 +56,10 @@ export class MapManager {
         tileLayer.addTo(this.map);
     }
 
+    /**
+     * Adds markers to the map.
+     * @param {Temple[]} temples - Array of temple objects.
+     */
     addMarkers(temples) {
         temples.forEach(temple => {
             const icon = L.divIcon({
@@ -63,18 +85,31 @@ export class MapManager {
         });
     }
 
+    /**
+     * smooth fly to coordinates.
+     * @param {[number, number]} coords
+     */
     flyTo(coords) {
-        if (this.isTransitioning) return;
+        if (this.isTransitioning || !this.map) return;
         this.isTransitioning = true;
         this.map.flyTo(coords, 16, { animate: true, duration: 1.5, easeLinearity: 0.25 });
     }
 
+    /**
+     * Opens the popup for a specific marker.
+     * @param {string} id
+     */
     openPopup(id) {
         if (this.markers[id]) {
             this.markers[id].openPopup();
         }
     }
 
+    /**
+     * Highlights a marker visually.
+     * @param {string} id
+     * @param {boolean} shouldHighlight
+     */
     highlightMarker(id, shouldHighlight) {
         const el = document.getElementById(`marker-${id}`);
         if (el) {
@@ -83,6 +118,10 @@ export class MapManager {
         }
     }
 
+    /**
+     * Sets a marker as active (persistent highlight).
+     * @param {string} id
+     */
     setActiveMarker(id) {
         this.clearActiveMarker();
         const el = document.getElementById(`marker-${id}`);

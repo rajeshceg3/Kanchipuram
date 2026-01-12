@@ -2,6 +2,7 @@
   "name": "kanchipuram-temples",
   "version": "1.0.0",
   "description": "A visualization of temples in Kanchipuram",
+  "type": "module",
   "main": "src/scripts/main.js",
   "scripts": {
     "dev": "vite",
