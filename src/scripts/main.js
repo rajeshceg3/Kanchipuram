@@ -20,14 +20,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Link Interactions
         mapManager.setCallbacks({
-            onMarkerClick: (id) => {
+            onMarkerClick: () => {
                 // Already handled by flyTo and openPopup within mapManager
             },
             onPopupOpen: (id) => {
                 mapManager.setActiveMarker(id);
                 uiManager.setActiveItem(id);
             },
-            onPopupClose: (id) => {
+            onPopupClose: () => {
                 mapManager.clearActiveMarker();
                 uiManager.clearActiveItem();
             }
@@ -55,6 +55,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.error("Initialization failed:", error);
         uiManager.showError();
     }
