@@ -51,12 +51,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Error Handling
         document.addEventListener('map:error', () => {
-            uiManager.showError();
+            uiManager.showError('Unable to load map tiles. Please check your connection.');
         });
 
     } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error("Initialization failed:", error);
-        uiManager.showError();
+        uiManager.showError(`Initialization failed: ${error.message}`);
     }
 });

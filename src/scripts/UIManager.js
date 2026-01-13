@@ -83,7 +83,12 @@ export class UIManager {
         if (li) {
             li.classList.add('active');
             li.setAttribute('aria-selected', 'true');
-            li.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            // Accessibility: Respect user's motion preference
+            const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const behavior = prefersReducedMotion ? 'auto' : 'smooth';
+
+            li.scrollIntoView({ behavior, block: 'nearest' });
         }
         this.activeItem = id;
     }
@@ -99,8 +104,9 @@ export class UIManager {
         this.activeItem = null;
     }
 
-    showError() {
+    showError(message = 'An error occurred while loading data.') {
         if (this.errorBanner) {
+            this.errorBanner.textContent = message;
             this.errorBanner.classList.add('visible');
             this.errorBanner.setAttribute('role', 'alert');
         }
