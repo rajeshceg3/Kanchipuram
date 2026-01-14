@@ -17,6 +17,21 @@ describe('UIManager', () => {
         loaderElement = document.getElementById('loader');
         errorBanner = document.getElementById('network-error-banner');
 
+        // Mock matchMedia
+        Object.defineProperty(window, 'matchMedia', {
+            writable: true,
+            value: vi.fn().mockImplementation(query => ({
+                matches: false,
+                media: query,
+                onchange: null,
+                addListener: vi.fn(), // Deprecated
+                removeListener: vi.fn(), // Deprecated
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+                dispatchEvent: vi.fn(),
+            })),
+        });
+
         uiManager = new UIManager();
     });
 
@@ -34,7 +49,7 @@ describe('UIManager', () => {
         expect(listItems[0].textContent).toContain('Era 1');
     });
 
-    it('should set the active item', () => {
+    it('should set the active item with smooth scroll when reduced motion is disabled', () => {
         const temples = [{ id: '1', name: 'Temple 1', era: 'Era 1' }];
         uiManager.renderList(temples);
 
@@ -45,7 +60,33 @@ describe('UIManager', () => {
         uiManager.setActiveItem('1');
 
         expect(listItem.classList.contains('active')).toBe(true);
-        expect(listItem.scrollIntoView).toHaveBeenCalled();
+        expect(listItem.scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'nearest' });
+    });
+
+    it('should set the active item with auto scroll when reduced motion is enabled', () => {
+        // Mock reduced motion preference
+        window.matchMedia.mockImplementation(query => ({
+            matches: query === '(prefers-reduced-motion: reduce)',
+            media: query,
+            onchange: null,
+            addListener: vi.fn(),
+            removeListener: vi.fn(),
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn(),
+            dispatchEvent: vi.fn(),
+        }));
+
+        const temples = [{ id: '1', name: 'Temple 1', era: 'Era 1' }];
+        uiManager.renderList(temples);
+
+        // Mock scrollIntoView
+        const listItem = document.getElementById('item-1');
+        listItem.scrollIntoView = vi.fn();
+
+        uiManager.setActiveItem('1');
+
+        expect(listItem.classList.contains('active')).toBe(true);
+        expect(listItem.scrollIntoView).toHaveBeenCalledWith({ behavior: 'auto', block: 'nearest' });
     });
 
     it('should clear the active item', () => {
