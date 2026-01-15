@@ -23,14 +23,20 @@ export class UIManager {
     }
 
     initLoader() {
-        window.addEventListener('load', () => {
+        const hideLoader = () => {
             if (this.loader) {
                 this.loader.classList.add('fade-out');
                 setTimeout(() => {
                     this.loader.classList.add('hidden');
                 }, 1000);
             }
-        });
+        };
+
+        if (document.readyState === 'complete') {
+            hideLoader();
+        } else {
+            window.addEventListener('load', hideLoader);
+        }
 
         // Initialize mobile toggle
         if (this.panelToggle && this.panel) {
