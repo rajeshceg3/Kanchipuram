@@ -91,6 +91,14 @@ export class MapManager {
      */
     flyTo(coords) {
         if (this.isTransitioning || !this.map) return;
+
+        const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        if (prefersReducedMotion) {
+            this.map.setView(coords, 16);
+            return;
+        }
+
         this.isTransitioning = true;
         this.map.flyTo(coords, 16, { animate: true, duration: 1.5, easeLinearity: 0.25 });
     }
