@@ -106,4 +106,17 @@ describe('UIManager', () => {
         uiManager.showError();
         expect(errorBanner.classList.contains('visible')).toBe(true);
     });
+
+    it('should hide loader when hideLoader is called', () => {
+        // Mock setTimeout
+        vi.useFakeTimers();
+
+        uiManager.hideLoader();
+        expect(loaderElement.classList.contains('fade-out')).toBe(true);
+
+        vi.advanceTimersByTime(1000);
+        expect(loaderElement.classList.contains('hidden')).toBe(true);
+
+        vi.useRealTimers();
+    });
 });

@@ -23,21 +23,6 @@ export class UIManager {
     }
 
     initLoader() {
-        const hideLoader = () => {
-            if (this.loader) {
-                this.loader.classList.add('fade-out');
-                setTimeout(() => {
-                    this.loader.classList.add('hidden');
-                }, 1000);
-            }
-        };
-
-        if (document.readyState === 'complete') {
-            hideLoader();
-        } else {
-            window.addEventListener('load', hideLoader);
-        }
-
         // Initialize mobile toggle
         if (this.panelToggle && this.panel) {
             this.panelToggle.addEventListener('click', () => {
@@ -45,6 +30,15 @@ export class UIManager {
                 this.panelToggle.classList.toggle('collapsed');
                 this.panelToggle.setAttribute('aria-expanded', !isHidden);
             });
+        }
+    }
+
+    hideLoader() {
+        if (this.loader) {
+            this.loader.classList.add('fade-out');
+            setTimeout(() => {
+                this.loader.classList.add('hidden');
+            }, 1000);
         }
     }
 

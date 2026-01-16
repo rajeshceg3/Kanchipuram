@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Initialize UI
         uiManager.renderList(temples);
+        uiManager.hideLoader();
 
         // Link Interactions
         mapManager.setCallbacks({
@@ -56,5 +57,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (error) {
         uiManager.showError(`Initialization failed: ${error.message}`);
+        uiManager.hideLoader();
     }
 });
