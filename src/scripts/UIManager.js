@@ -52,10 +52,17 @@ export class UIManager {
         temples.forEach(temple => {
             const li = document.createElement('li');
             li.id = `item-${temple.id}`;
-            li.innerHTML = `<h2>${sanitizeHTML(temple.name)}</h2><p>${sanitizeHTML(temple.era)}</p>`;
+            li.innerHTML = `
+                <h2>${sanitizeHTML(temple.name)}</h2>
+                <div class="meta-badges">
+                    <span class="badge badge-deity">${sanitizeHTML(temple.deity)}</span>
+                    <span class="badge badge-arch">${sanitizeHTML(temple.architecture)}</span>
+                </div>
+                <p>${sanitizeHTML(temple.era)}</p>
+            `;
             li.setAttribute('role', 'button');
             li.setAttribute('tabindex', '0');
-            li.setAttribute('aria-label', `Select ${temple.name}`);
+            li.setAttribute('aria-label', `Select ${temple.name}, dedicated to ${temple.deity}`);
 
             li.addEventListener('click', () => this.callbacks.onItemClick(temple.id));
             li.addEventListener('keydown', (e) => {

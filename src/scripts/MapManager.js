@@ -43,7 +43,7 @@ export class MapManager {
         });
 
         const tileLayer = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>',
             subdomains: 'abcd',
             maxZoom: 20
         });
@@ -70,8 +70,30 @@ export class MapManager {
             });
             const marker = L.marker(temple.coords, { icon: icon, alt: temple.name }).addTo(this.map);
 
-            const popupContent = `<h3>${sanitizeHTML(temple.name)}</h3><p>${sanitizeHTML(temple.description)}</p>`;
-            marker.bindPopup(popupContent);
+            const popupContent = `
+                <div class="popup-content-inner">
+                    <h3>${sanitizeHTML(temple.name)}</h3>
+                    <div class="popup-meta">
+                        <span class="popup-badge">${sanitizeHTML(temple.era)}</span>
+                        <span class="popup-badge">${sanitizeHTML(temple.architecture)}</span>
+                    </div>
+                    <p class="popup-desc">${sanitizeHTML(temple.description)}</p>
+                    <div class="popup-details">
+                        <div class="detail-row">
+                            <strong>Highlight:</strong> ${sanitizeHTML(temple.specialty)}
+                        </div>
+                        <div class="detail-row">
+                            <strong>Timings:</strong> ${sanitizeHTML(temple.hours)}
+                        </div>
+                    </div>
+                    <div class="popup-actions">
+                         <a href="https://www.google.com/maps/dir/?api=1&destination=${temple.coords[0]},${temple.coords[1]}" target="_blank" rel="noopener noreferrer" class="btn-directions">
+                            Get Directions
+                        </a>
+                    </div>
+                </div>
+            `;
+            marker.bindPopup(popupContent, { maxWidth: 300 });
 
             this.markers[temple.id] = marker;
 
