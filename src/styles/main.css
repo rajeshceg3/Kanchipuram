@@ -112,8 +112,13 @@ html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden;
 #temple-list li { padding: 16px 20px; margin: 6px 0; cursor: pointer; border-radius: 12px; transition: background-color 0.4s var(--timing-function), transform 0.4s var(--timing-function); position: relative; border-left: 3px solid transparent; }
 #temple-list li:hover, #temple-list li:focus { background-color: var(--accent-gold-faded); transform: translateX(-5px) scale(1.03); outline: none; }
 #temple-list li.active { background-color: var(--accent-gold-faded); border-left-color: var(--accent-gold); }
-#temple-list h2 { font-family: var(--font-serif); font-size: 17px; font-weight: 500; margin: 0 0 4px 0; color: var(--text-primary); }
-#temple-list p { font-size: 13px; font-weight: 400; margin: 0; color: var(--text-secondary); line-height: 1.4; font-style: italic; }
+#temple-list h2 { font-family: var(--font-serif); font-size: 17px; font-weight: 500; margin: 0 0 8px 0; color: var(--text-primary); }
+#temple-list p { font-size: 13px; font-weight: 400; margin: 8px 0 0 0; color: var(--text-secondary); line-height: 1.4; font-style: italic; }
+
+.meta-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+.badge { font-size: 10px; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; }
+.badge-deity { background-color: rgba(178, 154, 116, 0.2); color: #8f7a5b; }
+.badge-arch { background-color: rgba(92, 84, 75, 0.1); color: var(--text-secondary); }
 
 /* Replaced external image with gradient for reliability and security */
 .temple-marker {
@@ -130,10 +135,23 @@ html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden;
 .temple-marker.highlight, .leaflet-marker-icon:hover .temple-marker { background-color: var(--accent-gold); transform: scale(1.5); background-image: linear-gradient(135deg, var(--accent-gold) 0%, #8f7a5b 100%); }
 .temple-marker.active { background-color: var(--accent-gold); transform: scale(1.9); animation: pulse 1.8s infinite var(--timing-function); background-image: linear-gradient(135deg, var(--accent-gold) 0%, #8f7a5b 100%); }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(178, 154, 116, 0.7), var(--shadow-hard); } 70% { box-shadow: 0 0 0 18px rgba(178, 154, 116, 0), var(--shadow-hard); } 100% { box-shadow: 0 0 0 0 rgba(178, 154, 116, 0), var(--shadow-hard); } }
-.leaflet-popup-content-wrapper { background: rgba(249, 246, 241, 0.85); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); color: var(--text-primary); border-radius: 16px; box-shadow: var(--shadow-soft); border: 1px solid rgba(255,255,255,0.2); padding: 4px; }
-.leaflet-popup-content { margin: 20px; line-height: 1.7; font-size: 15px; }
-.leaflet-popup-content h3 { font-family: var(--font-serif); margin: 0 0 10px 0; font-size: 22px; font-weight: 500; color: var(--text-primary); border-bottom: 1px solid var(--accent-gold); padding-bottom: 10px; }
-.leaflet-popup-content p { margin: 0; font-weight: 400; color: var(--text-secondary); }
+.leaflet-popup-content-wrapper { background: rgba(249, 246, 241, 0.95); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); color: var(--text-primary); border-radius: 16px; box-shadow: var(--shadow-soft); border: 1px solid rgba(255,255,255,0.2); padding: 0; overflow: hidden; }
+.leaflet-popup-content { margin: 0; line-height: 1.6; font-size: 14px; }
+.popup-content-inner { padding: 24px; max-height: 60vh; overflow-y: auto; }
+.leaflet-popup-content h3 { font-family: var(--font-serif); margin: 0 0 12px 0; font-size: 20px; font-weight: 600; color: var(--text-primary); }
+.leaflet-popup-content p.popup-desc { margin: 12px 0; font-weight: 400; color: var(--text-primary); font-size: 14px; }
+
+.popup-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.popup-badge { font-size: 10px; background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; }
+
+.popup-details { background: rgba(255,255,255,0.5); padding: 12px; border-radius: 8px; margin-top: 12px; border: 1px solid rgba(0,0,0,0.03); }
+.detail-row { font-size: 13px; margin-bottom: 6px; color: var(--text-primary); }
+.detail-row:last-child { margin-bottom: 0; }
+.detail-row strong { color: #8f7a5b; font-weight: 600; display: block; font-size: 11px; text-transform: uppercase; margin-bottom: 2px; }
+
+.popup-actions { margin-top: 16px; text-align: right; }
+.btn-directions { display: inline-block; background: var(--accent-gold); color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; font-size: 12px; font-weight: 500; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(178, 154, 116, 0.4); }
+.btn-directions:hover { background: #8f7a5b; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(178, 154, 116, 0.5); }
 .leaflet-popup-tip-container { display: none; }
 .leaflet-control-zoom { border: 1px solid rgba(255,255,255,0.3); border-radius: 16px; box-shadow: var(--shadow-soft); overflow: hidden; border: none !important; }
 .leaflet-control-zoom a { background-color: var(--panel-background); backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); color: var(--text-primary); width: 38px; height: 38px; line-height: 38px; font-size: 20px; }
