@@ -149,6 +149,28 @@ html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden;
 .detail-row:last-child { margin-bottom: 0; }
 .detail-row strong { color: #8f7a5b; font-weight: 600; display: block; font-size: 11px; text-transform: uppercase; margin-bottom: 2px; }
 
+.popup-visit-separator {
+    margin-top: 8px;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    padding-top: 8px;
+}
+
+.list-visit-info {
+    font-size: 13px;
+    color: var(--text-primary);
+    margin-top: 8px;
+    font-weight: 400;
+}
+
+.list-visit-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--text-primary);
+    font-weight: 700;
+    opacity: 0.8;
+    margin-right: 4px;
+}
+
 .popup-actions { margin-top: 16px; text-align: right; }
 .btn-directions { display: inline-block; background: var(--accent-gold); color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; font-size: 12px; font-weight: 500; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(178, 154, 116, 0.4); }
 .btn-directions:hover { background: #8f7a5b; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(178, 154, 116, 0.5); }

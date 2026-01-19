@@ -59,6 +59,9 @@ export class UIManager {
                     <span class="badge badge-arch">${sanitizeHTML(temple.architecture)}</span>
                 </div>
                 <p>${sanitizeHTML(temple.era)}</p>
+                ${temple.visitInfo ? `<div class="list-visit-info">
+                     <span class="list-visit-label">Est. Duration:</span> ${sanitizeHTML(temple.visitInfo.duration)}
+                </div>` : ''}
             `;
             li.setAttribute('role', 'button');
             li.setAttribute('tabindex', '0');

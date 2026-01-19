@@ -85,6 +85,17 @@ export class MapManager {
                         <div class="detail-row">
                             <strong>Timings:</strong> ${sanitizeHTML(temple.hours)}
                         </div>
+                        ${temple.visitInfo ? `
+                        <div class="detail-row popup-visit-separator">
+                            <strong>Best Time:</strong> ${sanitizeHTML(temple.visitInfo.bestTime)}
+                        </div>
+                        <div class="detail-row">
+                            <strong>Visit Duration:</strong> ${sanitizeHTML(temple.visitInfo.duration)}
+                        </div>
+                        <div class="detail-row">
+                            <strong>Dress Code:</strong> ${sanitizeHTML(temple.visitInfo.dressCode)}
+                        </div>
+                        ` : ''}
                     </div>
                     <div class="popup-actions">
                          <a href="https://www.google.com/maps/dir/?api=1&destination=${temple.coords[0]},${temple.coords[1]}" target="_blank" rel="noopener noreferrer" class="btn-directions">
