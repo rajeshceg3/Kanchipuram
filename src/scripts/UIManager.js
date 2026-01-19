@@ -75,6 +75,9 @@ export class UIManager {
                     <span class="badge badge-arch">${sanitizeHTML(temple.architecture)}</span>
                 </div>
                 <p>${sanitizeHTML(temple.era)}</p>
+                <div class="list-highlight">
+                    <span class="icon-star">✦</span> ${sanitizeHTML(temple.specialty)}
+                </div>
                 ${temple.visitInfo ? `<div class="list-visit-info">
                      <span class="list-visit-label">Est. Duration:</span> ${sanitizeHTML(temple.visitInfo.duration)}
                 </div>` : ''}
