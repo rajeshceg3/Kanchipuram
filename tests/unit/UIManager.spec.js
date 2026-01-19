@@ -107,16 +107,29 @@ describe('UIManager', () => {
         expect(errorBanner.classList.contains('visible')).toBe(true);
     });
 
-    it('should hide loader when hideLoader is called', () => {
+    it('should hide loader when hideLoader is called (fallback)', () => {
         // Mock setTimeout
         vi.useFakeTimers();
 
         uiManager.hideLoader();
         expect(loaderElement.classList.contains('fade-out')).toBe(true);
 
-        vi.advanceTimersByTime(1000);
+        // Advance timers by enough time to trigger the safety fallback (1100ms)
+        vi.advanceTimersByTime(1100);
         expect(loaderElement.classList.contains('hidden')).toBe(true);
 
         vi.useRealTimers();
+    });
+
+    it('should hide loader immediately on transitionend', () => {
+        uiManager.hideLoader();
+        expect(loaderElement.classList.contains('fade-out')).toBe(true);
+
+        // Simulate transitionend event
+        const event = new Event('transitionend');
+        Object.defineProperty(event, 'target', { value: loaderElement });
+        loaderElement.dispatchEvent(event);
+
+        expect(loaderElement.classList.contains('hidden')).toBe(true);
     });
 });

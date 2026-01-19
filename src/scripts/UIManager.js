@@ -34,12 +34,28 @@ export class UIManager {
     }
 
     hideLoader() {
-        if (this.loader) {
-            this.loader.classList.add('fade-out');
-            setTimeout(() => {
+        if (!this.loader) return;
+
+        const onTransitionEnd = (e) => {
+            if (e.target !== this.loader) return;
+            this.loader.classList.add('hidden');
+            this.loader.removeEventListener('transitionend', onTransitionEnd);
+        };
+
+        this.loader.addEventListener('transitionend', onTransitionEnd);
+
+        // Force reflow to ensure transition works if element was just added/shown
+        void this.loader.offsetWidth;
+
+        this.loader.classList.add('fade-out');
+
+        // Safety fallback in case transitionend doesn't fire
+        setTimeout(() => {
+            if (!this.loader.classList.contains('hidden')) {
                 this.loader.classList.add('hidden');
-            }, 1000);
-        }
+                this.loader.removeEventListener('transitionend', onTransitionEnd);
+            }
+        }, 1100);
     }
 
     /**
