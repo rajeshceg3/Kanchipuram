@@ -9,7 +9,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     uiManager.initLoader();
 
     try {
+        console.log('Starting application initialization...');
         const temples = await DataManager.getAllTemples();
+        console.log(`Loaded ${temples.length} temples.`);
 
         // Initialize Map
         mapManager.init([12.84, 79.70], 14);
@@ -17,7 +19,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Initialize UI
         uiManager.renderList(temples);
-        uiManager.hideLoader();
 
         // Link Interactions
         mapManager.setCallbacks({
@@ -52,11 +53,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Error Handling
         document.addEventListener('map:error', () => {
+            console.error('Map tile error detected.');
             uiManager.showError('Unable to load map tiles. Please check your connection.');
         });
 
     } catch (error) {
+        console.error('Initialization error:', error);
         uiManager.showError(`Initialization failed: ${error.message}`);
+    } finally {
         uiManager.hideLoader();
     }
 });
