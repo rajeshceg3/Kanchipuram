@@ -78,13 +78,33 @@ export class MapManager {
                         <span class="popup-badge">${sanitizeHTML(temple.architecture)}</span>
                     </div>
                     <p class="popup-desc">${sanitizeHTML(temple.description)}</p>
+
+                    ${temple.mythology ? `
+                    <div class="popup-section">
+                        <h4><span class="section-icon">📜</span> Myth & Legend</h4>
+                        <p class="section-text">${sanitizeHTML(temple.mythology)}</p>
+                    </div>` : ''}
+
+                    ${temple.architecturalHighlight ? `
+                    <div class="popup-section">
+                        <h4><span class="section-icon">🏛️</span> Architecture Focus</h4>
+                        <p class="section-text">${sanitizeHTML(temple.architecturalHighlight)}</p>
+                    </div>` : ''}
+
                     <div class="popup-details">
                         <div class="detail-row">
                             <strong>Highlight:</strong> ${sanitizeHTML(temple.specialty)}
                         </div>
+
+                        ${temple.festivals && temple.festivals.length ? `
+                        <div class="detail-row">
+                            <strong>Festivals:</strong> ${sanitizeHTML(temple.festivals.join(', '))}
+                        </div>` : ''}
+
                         <div class="detail-row">
                             <strong>Timings:</strong> ${sanitizeHTML(temple.hours)}
                         </div>
+
                         ${temple.visitInfo ? `
                         <div class="detail-row popup-visit-separator">
                             <strong>Best Time:</strong> ${sanitizeHTML(temple.visitInfo.bestTime)}
@@ -96,6 +116,11 @@ export class MapManager {
                             <strong>Dress Code:</strong> ${sanitizeHTML(temple.visitInfo.dressCode)}
                         </div>
                         ` : ''}
+
+                         ${temple.photographyTip ? `
+                        <div class="photography-tip">
+                            <strong>📸 Pro Tip:</strong> ${sanitizeHTML(temple.photographyTip)}
+                        </div>` : ''}
                     </div>
                     <div class="popup-actions">
                          <a href="https://www.google.com/maps/dir/?api=1&destination=${temple.coords[0]},${temple.coords[1]}" target="_blank" rel="noopener noreferrer" class="btn-directions">

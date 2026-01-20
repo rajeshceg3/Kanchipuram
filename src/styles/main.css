@@ -197,3 +197,61 @@ html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden;
         scroll-behavior: auto !important;
     }
 }
+
+/* Enhanced List Styles */
+.list-highlight {
+    font-size: 12px;
+    color: var(--accent-gold);
+    font-weight: 500;
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.icon-star {
+    font-size: 14px;
+}
+
+/* Enhanced Popup Styles */
+.popup-section {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(0,0,0,0.05);
+}
+.popup-section h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.section-icon {
+    font-size: 14px;
+}
+.section-text {
+    font-size: 13px;
+    font-style: italic;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
+}
+.photography-tip {
+    background-color: var(--accent-gold-faded);
+    padding: 10px;
+    border-radius: 6px;
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--text-primary);
+    border: 1px solid rgba(178, 154, 116, 0.2);
+    font-style: italic;
+}
+.photography-tip strong {
+    color: #8f7a5b;
+    display: inline;
+    text-transform: none;
+    font-style: normal;
+}
