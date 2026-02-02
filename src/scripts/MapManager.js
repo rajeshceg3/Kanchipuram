@@ -64,7 +64,7 @@ export class MapManager {
         temples.forEach(temple => {
             const icon = L.divIcon({
                 className: 'temple-marker-container',
-                html: `<div id="marker-${temple.id}" class="temple-marker"></div>`,
+                html: `<div id="marker-${temple.id}" class="temple-marker" role="button" aria-label="Marker for ${sanitizeHTML(temple.name)}" tabindex="0"></div>`,
                 iconSize: [18, 18],
                 iconAnchor: [9, 9]
             });
