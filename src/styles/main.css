@@ -1,3 +1,5 @@
+@import './skeleton.css';
+
 :root {
     --base-background: #f4f1ea;
     --panel-background: rgba(249, 246, 241, 0.8);

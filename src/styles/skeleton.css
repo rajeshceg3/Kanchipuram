@@ -1,0 +1,40 @@
+@keyframes skeleton-loading {
+    0% { background-color: rgba(0,0,0,0.05); }
+    50% { background-color: rgba(0,0,0,0.1); }
+    100% { background-color: rgba(0,0,0,0.05); }
+}
+
+.skeleton-item {
+    padding: 16px 20px;
+    margin: 6px 0;
+    border-radius: 12px;
+    border-left: 3px solid transparent;
+}
+
+.skeleton-title {
+    height: 20px;
+    width: 60%;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    animation: skeleton-loading 1.5s infinite ease-in-out;
+}
+
+.skeleton-badges {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.skeleton-badge {
+    height: 16px;
+    width: 40px;
+    border-radius: 4px;
+    animation: skeleton-loading 1.5s infinite ease-in-out;
+}
+
+.skeleton-text {
+    height: 14px;
+    width: 80%;
+    border-radius: 4px;
+    animation: skeleton-loading 1.5s infinite ease-in-out;
+}

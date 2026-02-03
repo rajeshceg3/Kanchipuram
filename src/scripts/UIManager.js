@@ -62,6 +62,25 @@ export class UIManager {
      * Renders the list of temples.
      * @param {Temple[]} temples
      */
+    renderSkeleton() {
+        if (!this.listElement) return;
+        this.listElement.innerHTML = '';
+        for (let i = 0; i < 5; i++) {
+            const li = document.createElement('li');
+            li.className = 'skeleton-item';
+            li.setAttribute('aria-hidden', 'true');
+            li.innerHTML = `
+                <div class="skeleton-title"></div>
+                <div class="skeleton-badges">
+                    <div class="skeleton-badge"></div>
+                    <div class="skeleton-badge"></div>
+                </div>
+                <div class="skeleton-text"></div>
+            `;
+            this.listElement.appendChild(li);
+        }
+    }
+
     renderList(temples) {
         if (!this.listElement) return;
         this.listElement.innerHTML = '';
