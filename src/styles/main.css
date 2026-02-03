@@ -111,9 +111,24 @@ html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden;
 .network-error { display: none; background-color: var(--error-color); color: white; font-size: 12px; padding: 8px 24px; text-align: center; }
 .network-error.visible { display: block; }
 #temple-list { list-style: none; padding: 12px; margin: 0; overflow-y: auto; flex-grow: 1; }
-#temple-list li { padding: 16px 20px; margin: 6px 0; cursor: pointer; border-radius: 12px; transition: background-color 0.4s var(--timing-function), transform 0.4s var(--timing-function); position: relative; border-left: 3px solid transparent; }
-#temple-list li:hover, #temple-list li:focus { background-color: var(--accent-gold-faded); transform: translateX(-5px) scale(1.03); outline: none; }
-#temple-list li.active { background-color: var(--accent-gold-faded); border-left-color: var(--accent-gold); }
+#temple-list li { margin: 6px 0; padding: 0; display: block; }
+.temple-card-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    font-family: inherit;
+    color: inherit;
+    padding: 16px 20px;
+    cursor: pointer;
+    border-radius: 12px;
+    transition: background-color 0.4s var(--timing-function), transform 0.4s var(--timing-function);
+    position: relative;
+    border-left: 3px solid transparent;
+}
+.temple-card-btn:hover, .temple-card-btn:focus { background-color: var(--accent-gold-faded); transform: translateX(-5px) scale(1.03); outline: none; }
+.temple-card-btn.active { background-color: var(--accent-gold-faded); border-left-color: var(--accent-gold); }
 #temple-list h2 { font-family: var(--font-serif); font-size: 17px; font-weight: 500; margin: 0 0 8px 0; color: var(--text-primary); }
 #temple-list p { font-size: 13px; font-weight: 400; margin: 8px 0 0 0; color: var(--text-secondary); line-height: 1.4; font-style: italic; }
 

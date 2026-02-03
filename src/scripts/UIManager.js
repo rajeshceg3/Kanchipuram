@@ -87,7 +87,12 @@ export class UIManager {
         temples.forEach(temple => {
             const li = document.createElement('li');
             li.id = `item-${temple.id}`;
-            li.innerHTML = `
+            li.className = 'temple-item'; // Class for structural styling
+
+            const btn = document.createElement('button');
+            btn.className = 'temple-card-btn';
+            btn.setAttribute('aria-label', `Select ${temple.name}, dedicated to ${temple.deity}`);
+            btn.innerHTML = `
                 <h2>${sanitizeHTML(temple.name)}</h2>
                 <div class="meta-badges">
                     <span class="badge badge-deity">${sanitizeHTML(temple.deity)}</span>
@@ -101,22 +106,15 @@ export class UIManager {
                      <span class="list-visit-label">Est. Duration:</span> ${sanitizeHTML(temple.visitInfo.duration)}
                 </div>` : ''}
             `;
-            li.setAttribute('role', 'button');
-            li.setAttribute('tabindex', '0');
-            li.setAttribute('aria-label', `Select ${temple.name}, dedicated to ${temple.deity}`);
 
-            li.addEventListener('click', () => this.callbacks.onItemClick(temple.id));
-            li.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault(); // Prevent scrolling for Space
-                    this.callbacks.onItemClick(temple.id);
-                }
-            });
-            li.addEventListener('mouseover', () => this.callbacks.onItemHover(temple.id));
-            li.addEventListener('mouseout', () => this.callbacks.onItemBlur(temple.id));
-            li.addEventListener('focus', () => this.callbacks.onItemHover(temple.id)); // Accessibility: hover effect on focus
-            li.addEventListener('blur', () => this.callbacks.onItemBlur(temple.id));
+            btn.addEventListener('click', () => this.callbacks.onItemClick(temple.id));
+            // Standard buttons handle Enter/Space natively, no need for keydown
+            btn.addEventListener('mouseover', () => this.callbacks.onItemHover(temple.id));
+            btn.addEventListener('mouseout', () => this.callbacks.onItemBlur(temple.id));
+            btn.addEventListener('focus', () => this.callbacks.onItemHover(temple.id));
+            btn.addEventListener('blur', () => this.callbacks.onItemBlur(temple.id));
 
+            li.appendChild(btn);
             this.listElement.appendChild(li);
         });
     }
@@ -129,8 +127,10 @@ export class UIManager {
         this.clearActiveItem();
         const li = document.getElementById(`item-${id}`);
         if (li) {
-            li.classList.add('active');
-            li.setAttribute('aria-selected', 'true');
+            const btn = li.querySelector('.temple-card-btn');
+            if (btn) btn.classList.add('active');
+            // aria-selected is not valid for buttons in a list (unless role=listbox)
+            // We use visual indication and focus management.
 
             // Accessibility: Respect user's motion preference
             const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -145,8 +145,8 @@ export class UIManager {
         if (this.activeItem) {
             const li = document.getElementById(`item-${this.activeItem}`);
             if (li) {
-                li.classList.remove('active');
-                li.setAttribute('aria-selected', 'false');
+                const btn = li.querySelector('.temple-card-btn');
+                if (btn) btn.classList.remove('active');
             }
         }
         this.activeItem = null;
