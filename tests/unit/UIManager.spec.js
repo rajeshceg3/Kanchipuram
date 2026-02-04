@@ -59,7 +59,8 @@ describe('UIManager', () => {
 
         uiManager.setActiveItem('1');
 
-        expect(listItem.classList.contains('active')).toBe(true);
+        const btn = listItem.querySelector('.temple-card-btn');
+        expect(btn.classList.contains('active')).toBe(true);
         expect(listItem.scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'nearest' });
     });
 
@@ -85,7 +86,8 @@ describe('UIManager', () => {
 
         uiManager.setActiveItem('1');
 
-        expect(listItem.classList.contains('active')).toBe(true);
+        const btn = listItem.querySelector('.temple-card-btn');
+        expect(btn.classList.contains('active')).toBe(true);
         expect(listItem.scrollIntoView).toHaveBeenCalledWith({ behavior: 'auto', block: 'nearest' });
     });
 
@@ -96,10 +98,11 @@ describe('UIManager', () => {
         listItem.scrollIntoView = vi.fn(); // Mock
 
         uiManager.setActiveItem('1');
-        expect(listItem.classList.contains('active')).toBe(true);
+        const btn = listItem.querySelector('.temple-card-btn');
+        expect(btn.classList.contains('active')).toBe(true);
 
         uiManager.clearActiveItem();
-        expect(listItem.classList.contains('active')).toBe(false);
+        expect(btn.classList.contains('active')).toBe(false);
     });
 
     it('should show error banner', () => {

@@ -1,0 +1,8 @@
+{
+  "timestamp": "2026-02-03T18:12:33.803Z",
+  "consoleErrors": [
+    "SECURITY: Mixed content detected: http://localhost:5173/@vite/client, http://localhost:5173/manifest.json, http://localhost:5173/styles/main.css, http://localhost:5173/#temple-list, http://localhost:5173/#, http://localhost:5173/#, http://localhost:5173/scripts/main.js?t=1770142331663"
+  ],
+  "accessibility": [],
+  "network": []
+}
