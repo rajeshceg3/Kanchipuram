@@ -24,7 +24,8 @@ class DataManager {
         // Simulating async behavior for future API integration
         return new Promise((resolve) => {
             setTimeout(() => {
-                resolve(this.data);
+                // Return a deep copy to prevent mutation of the source of truth
+                resolve(structuredClone(this.data));
             }, 300); // Added slight delay to make loader visible and test realistic async
         });
     }
@@ -35,7 +36,8 @@ class DataManager {
      * @returns {Temple | undefined} The temple object if found, otherwise undefined.
      */
     getTempleById(id) {
-        return this.data.find(temple => temple.id === id);
+        const temple = this.data.find(temple => temple.id === id);
+        return temple ? structuredClone(temple) : undefined;
     }
 }
 
