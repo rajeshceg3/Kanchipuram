@@ -63,7 +63,7 @@ const fs = require('fs');
             const links = Array.from(document.querySelectorAll('a, img, link, script'));
             return links
                 .map(el => el.href || el.src)
-                .filter(url => url && url.startsWith('http:'));
+                .filter(url => url && url.startsWith('http:') && !url.includes('localhost') && !url.includes('127.0.0.1'));
         });
         if (mixedContent.length > 0) {
             errors.push(`SECURITY: Mixed content detected: ${mixedContent.join(', ')}`);

@@ -35,6 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (temple) {
                     mapManager.flyTo(temple.coords);
                     mapManager.openPopup(id);
+                    // Collapse panel on mobile to reveal map
+                    uiManager.collapsePanel();
                 }
             },
             onItemHover: (id) => {

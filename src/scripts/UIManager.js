@@ -33,6 +33,17 @@ export class UIManager {
         }
     }
 
+    collapsePanel() {
+        if (this.panel && this.panelToggle) {
+            // Force hide the panel on mobile
+            if (!this.panel.classList.contains('hidden-mobile')) {
+                this.panel.classList.add('hidden-mobile');
+                this.panelToggle.classList.add('collapsed');
+                this.panelToggle.setAttribute('aria-expanded', 'false');
+            }
+        }
+    }
+
     hideLoader() {
         if (!this.loader) return;
 
