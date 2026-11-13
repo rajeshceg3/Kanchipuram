@@ -2,6 +2,16 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MapManager } from '../../src/scripts/MapManager.js';
 import L from 'leaflet';
 
+// Mock the MapLibre GL Leaflet bridge (warm paper basemap layer)
+vi.mock('@maplibre/maplibre-gl-leaflet', () => {
+    return {
+        maplibreGL: vi.fn(() => ({
+            addTo: vi.fn(),
+            getMaplibreMap: vi.fn(() => ({ on: vi.fn() }))
+        }))
+    };
+});
+
 // Mock Leaflet
 vi.mock('leaflet', () => {
     return {
@@ -9,7 +19,10 @@ vi.mock('leaflet', () => {
             map: vi.fn(() => ({
                 setView: vi.fn().mockReturnThis(),
                 on: vi.fn(),
-                flyTo: vi.fn()
+                flyTo: vi.fn(),
+                attributionControl: {
+                    addAttribution: vi.fn()
+                }
             })),
             control: {
                 zoom: vi.fn(() => ({ addTo: vi.fn() }))

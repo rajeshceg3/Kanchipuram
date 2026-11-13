@@ -1,5 +1,8 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { maplibreGL } from '@maplibre/maplibre-gl-leaflet';
+import 'maplibre-gl/dist/maplibre-gl.css';
+import warmMapStyle from '../vendor/warm-map/style.json';
 import { sanitizeHTML } from './utils.js';
 
 /**
@@ -42,18 +45,18 @@ export class MapManager {
             this.isTransitioning = false;
         });
 
-        const tileLayer = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>',
-            subdomains: 'abcd',
-            maxZoom: 20
-        });
+        // Warm paper basemap (worlds shared module): OpenFreeMap vector tiles,
+        // custom watercolor-wash style. Free public instance, no API key.
+        const glLayer = maplibreGL({ style: warmMapStyle });
+        glLayer.addTo(this.map);
 
-        tileLayer.on('tileerror', () => {
+        this.map.attributionControl.addAttribution('<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> <a href="https://www.openmaptiles.org/" target="_blank">&copy; OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>');
+
+        const glMap = glLayer.getMaplibreMap();
+        glMap.on('error', () => {
             // Dispatch custom event or callback for error
             document.dispatchEvent(new CustomEvent('map:error'));
         });
-
-        tileLayer.addTo(this.map);
     }
 
     /**
