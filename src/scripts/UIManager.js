@@ -23,25 +23,49 @@ export class UIManager {
     }
 
     initLoader() {
-        // Initialize mobile toggle
-        if (this.panelToggle && this.panel) {
-            this.panelToggle.addEventListener('click', () => {
-                const isHidden = this.panel.classList.toggle('hidden-mobile');
-                this.panelToggle.classList.toggle('collapsed');
-                this.panelToggle.setAttribute('aria-expanded', !isHidden);
-            });
+        this.panelToggle?.addEventListener('click', () => this.setPanelOpen(this.panel.classList.contains('hidden-mobile')));
+        document.getElementById('panel-close')?.addEventListener('click', () => this.setPanelOpen(false));
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !this.panel?.classList.contains('hidden-mobile')) this.setPanelOpen(false);
+            if (e.key === 'Tab' && this.panel && !this.panel.inert && window.innerWidth <= 768) {
+                const controls = [...this.panel.querySelectorAll('button, a[href]')];
+                const first = controls[0], last = controls.at(-1);
+                if (e.shiftKey && document.activeElement === first) {e.preventDefault(); last?.focus();}
+                else if (!e.shiftKey && document.activeElement === last) {e.preventDefault(); first?.focus();}
+            }
+        });
+        const sync = () => this.syncPanel();
+        window.addEventListener('resize', sync);
+        this.syncPanel();
+    }
+
+    syncPanel() {
+        if (!this.panel) return;
+        const mobile = window.innerWidth <= 768;
+        const hidden = mobile && this.panel.classList.contains('hidden-mobile');
+        this.panel.inert = hidden;
+        this.panel.setAttribute('aria-hidden', String(hidden));
+        if (mobile) this.panel.setAttribute('aria-modal', 'true');
+        else this.panel.removeAttribute('aria-modal');
+        this.panel.setAttribute('role', mobile ? 'dialog' : 'complementary');
+    }
+
+    setPanelOpen(open) {
+        if (!this.panel || !this.panelToggle) return;
+        this.panel.classList.toggle('hidden-mobile', !open);
+        this.panelToggle.classList.toggle('collapsed', !open);
+        this.panelToggle.setAttribute('aria-expanded', String(open));
+        this.panelToggle.setAttribute('aria-label', open ? 'Close temples' : 'Open temples');
+        this.syncPanel();
+        if (open) document.dispatchEvent(new CustomEvent('temples:open'));
+        if (window.innerWidth <= 768) {
+            if (open) document.getElementById('panel-close')?.focus();
+            else this.panelToggle.focus();
         }
     }
 
     collapsePanel() {
-        if (this.panel && this.panelToggle) {
-            // Force hide the panel on mobile
-            if (!this.panel.classList.contains('hidden-mobile')) {
-                this.panel.classList.add('hidden-mobile');
-                this.panelToggle.classList.add('collapsed');
-                this.panelToggle.setAttribute('aria-expanded', 'false');
-            }
-        }
+        if (window.innerWidth <= 768) this.setPanelOpen(false);
     }
 
     hideLoader() {

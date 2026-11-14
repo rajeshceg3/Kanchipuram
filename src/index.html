@@ -26,17 +26,17 @@
     <a href="#temple-list" class="skip-link">Skip to main content</a>
     <div id="app-container">
         <div id="map" role="main" aria-label="Temple Map"></div>
-        <button id="panel-toggle" class="panel-toggle" aria-label="Toggle panel" aria-expanded="true">
-            <span class="icon"></span>
+        <header class="map-heading"><h1>Kanchipuram</h1><p>A contemplation of form</p></header>
+        <button id="panel-toggle" class="panel-toggle collapsed" aria-label="Open temples" aria-controls="panel" aria-expanded="false">
+            <span class="toggle-label">Temples</span><span aria-hidden="true">✦</span>
         </button>
-        <div id="panel" role="complementary" aria-label="Temple List">
+        <div id="panel" class="hidden-mobile" role="complementary" aria-label="Temple List">
             <div class="panel-header">
-                <h1>Kanchipuram</h1>
-                <p>Steeped in myth and carved from the bedrock of history, Kanchipuram is not merely a city—it is a <em>Mokshapuri</em>, one of the seven sacred cities of liberation. As the ancient capital of the Pallavas and a canvas for Chola and Vijayanagara emperors, its streets form a living labyrinth of 1,000 temples.</p>
-                <p>From the earth-shaking grandeur of Ekambareswarar to the sandstone poetry of Kailasanathar, explore a sacred geography where divine legends and architectural mastery converge. Traverse the "Golden City" not just as a tourist, but as a pilgrim of art, history, and the eternal.</p>
+                <div><h2>Six sacred places</h2><p>Choose a temple to read its story.</p></div>
+                <button id="panel-close" type="button" aria-label="Close temples">×</button>
             </div>
             <div id="network-error-banner" class="network-error">Map service is currently unavailable.</div>
-            <ul id="temple-list"></ul>
+            <ul id="temple-list" tabindex="-1"></ul>
         </div>
     </div>
     <script type="module" src="/scripts/main.js"></script>

@@ -40,6 +40,7 @@ export class MapManager {
     init(center, zoom) {
         this.map = L.map(this.mapId, { zoomControl: false }).setView(center, zoom);
         L.control.zoom({ position: 'bottomleft' }).addTo(this.map);
+        window.matchMedia('(max-width: 768px)').addEventListener('change', () => this.map.closePopup());
 
         this.map.on('moveend', () => {
             this.isTransitioning = false;
@@ -68,8 +69,8 @@ export class MapManager {
             const icon = L.divIcon({
                 className: 'temple-marker-container',
                 html: `<div id="marker-${temple.id}" class="temple-marker"></div>`,
-                iconSize: [18, 18],
-                iconAnchor: [9, 9]
+                iconSize: [44, 44],
+                iconAnchor: [22, 22]
             });
             const marker = L.marker(temple.coords, { icon: icon, title: temple.name, alt: temple.name }).addTo(this.map);
 
@@ -84,13 +85,13 @@ export class MapManager {
 
                     ${temple.mythology ? `
                     <div class="popup-section">
-                        <h4><span class="section-icon">📜</span> Myth & Legend</h4>
+                        <h4>Myth & Legend</h4>
                         <p class="section-text">${sanitizeHTML(temple.mythology)}</p>
                     </div>` : ''}
 
                     ${temple.architecturalHighlight ? `
                     <div class="popup-section">
-                        <h4><span class="section-icon">🏛️</span> Architecture Focus</h4>
+                        <h4>Architecture Focus</h4>
                         <p class="section-text">${sanitizeHTML(temple.architecturalHighlight)}</p>
                     </div>` : ''}
 
@@ -122,9 +123,10 @@ export class MapManager {
 
                          ${temple.photographyTip ? `
                         <div class="photography-tip">
-                            <strong>📸 Pro Tip:</strong> ${sanitizeHTML(temple.photographyTip)}
+                            <strong>Photography:</strong> ${sanitizeHTML(temple.photographyTip)}
                         </div>` : ''}
                     </div>
+                    <p class="planning-note">Planning notes, not live opening hours. Confirm access and timings before visiting.</p>
                     <div class="popup-actions">
                          <a href="https://www.google.com/maps/dir/?api=1&destination=${temple.coords[0]},${temple.coords[1]}" target="_blank" rel="noopener noreferrer" class="btn-directions">
                             Get Directions
@@ -132,7 +134,7 @@ export class MapManager {
                     </div>
                 </div>
             `;
-            marker.bindPopup(popupContent, { maxWidth: 300 });
+            marker.bindPopup(popupContent, { maxWidth: 360, autoPan: window.innerWidth > 768, className: 'temple-story' });
 
             this.markers[temple.id] = marker;
 
@@ -141,7 +143,24 @@ export class MapManager {
                 this.flyTo(temple.coords);
                 marker.openPopup();
             });
-            marker.on('popupopen', () => this.callbacks.onPopupOpen(temple.id));
+            marker.on('popupopen', () => {
+                this.callbacks.onPopupOpen(temple.id);
+                const el = marker.getPopup().getElement();
+                document.getElementById('app-container').appendChild(el);
+                el.setAttribute('role', 'dialog');
+                el.setAttribute('aria-label', temple.name);
+                const close = el.querySelector('.leaflet-popup-close-button');
+                close.setAttribute('aria-label', 'Close story');
+                close.focus({preventScroll:true});
+                el.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {e.preventDefault(); this.map.closePopup();}
+                    if (e.key === 'Tab') {
+                        const nodes = [...el.querySelectorAll('a[href],button')];
+                        if (e.shiftKey && document.activeElement === nodes[0]) {e.preventDefault();nodes.at(-1).focus();}
+                        else if (!e.shiftKey && document.activeElement === nodes.at(-1)) {e.preventDefault();nodes[0].focus();}
+                    }
+                });
+            });
             marker.on('popupclose', () => this.callbacks.onPopupClose(temple.id));
         });
     }
