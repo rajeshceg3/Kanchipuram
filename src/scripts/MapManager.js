@@ -1,4 +1,7 @@
 import L from 'leaflet';
+import { setWorkerUrl } from 'maplibre-gl';
+import mapWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
+setWorkerUrl(mapWorkerUrl);
 import 'leaflet/dist/leaflet.css';
 import { maplibreGL } from '@maplibre/maplibre-gl-leaflet';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -54,6 +57,8 @@ export class MapManager {
         this.map.attributionControl.addAttribution('<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> <a href="https://www.openmaptiles.org/" target="_blank">&copy; OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>');
 
         const glMap = glLayer.getMaplibreMap();
+        // Read-only readiness handle for the rendered-feature regression check.
+        this.map.getContainer()._warmMap = glMap;
         glMap.on('error', () => {
             // Dispatch custom event or callback for error
             document.dispatchEvent(new CustomEvent('map:error'));
