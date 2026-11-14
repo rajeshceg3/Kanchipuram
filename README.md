@@ -80,3 +80,11 @@ npm run lint
 ## Deployment
 The `dist/` folder contains static assets ready for deployment to any static host (Netlify, Vercel, AWS S3, etc.).
 Ensure your web server adds the appropriate `Content-Security-Policy` headers if not already handled by the HTML meta tag.
+
+### Mobile notebook regression
+`CHROME_PATH=/usr/bin/google-chrome node tests/mobile-notebook.cjs http://localhost:5173`
+checks all six temple stories at 320/390/1280, inert closed list, disclosure,
+scroll to directions, bounded close, Escape/focus, overflow and runtime errors.
+Set `REDUCED=1` for reduced-motion coverage. Screenshots go to `/tmp`.
+The original verification runner currently has 16 unit tests and 10 browser tests;
+its older 22-test description is stale.

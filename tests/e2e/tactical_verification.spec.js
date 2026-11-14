@@ -16,9 +16,10 @@ test.describe('Tactical Verification Protocol', () => {
         await page.goto('/');
 
         // Wait for list
-        await page.waitForSelector('.temple-card-btn');
+        await page.waitForSelector('.temple-card-btn', { state: 'attached' });
 
         const panel = page.locator('#panel');
+        await page.locator('#panel-toggle').click();
         await expect(panel).toBeVisible();
 
         // Click first item

@@ -35,8 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (temple) {
                     mapManager.flyTo(temple.coords);
                     mapManager.openPopup(id);
-                    // Collapse panel on mobile to reveal map
-                    uiManager.collapsePanel();
+
                 }
             },
             onItemHover: (id) => {
@@ -52,6 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
         uiManager.showError(`Initialization failed: ${error.message}`);
     });
 
+    document.addEventListener('temples:open', () => mapManager.map.closePopup());
+
     // Map interactions
     mapManager.setCallbacks({
         onMarkerClick: () => {
@@ -60,10 +61,12 @@ document.addEventListener('DOMContentLoaded', () => {
         onPopupOpen: (id) => {
             mapManager.setActiveMarker(id);
             uiManager.setActiveItem(id);
+            uiManager.collapsePanel();
         },
         onPopupClose: () => {
             mapManager.clearActiveMarker();
             uiManager.clearActiveItem();
+            if (window.innerWidth <= 768) document.getElementById('panel-toggle')?.focus({preventScroll:true});
         }
     });
 
