@@ -12,6 +12,8 @@ vi.mock('@maplibre/maplibre-gl-leaflet', () => {
     };
 });
 
+vi.mock('maplibre-gl', () => ({ setWorkerUrl: vi.fn() }));
+
 // Mock Leaflet
 vi.mock('leaflet', () => {
     return {
@@ -19,6 +21,7 @@ vi.mock('leaflet', () => {
             map: vi.fn(() => ({
                 setView: vi.fn().mockReturnThis(),
                 on: vi.fn(),
+                getContainer: vi.fn(() => ({})),
                 flyTo: vi.fn(),
                 attributionControl: {
                     addAttribution: vi.fn()
